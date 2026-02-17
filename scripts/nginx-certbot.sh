@@ -6,7 +6,7 @@
 URL="simo6king.duckdns.org"        # e.g., example.com
 APP_NAME="site"   # e.g., myapp
 APP_PORT="8080"   # e.g., 3000
-EMAIL="abssad.2003@gmail.com"      # e.g., your-email@example.com
+EMAIL="abdessamadajiemail@gmail.com"      # e.g., your-email@example.com
 
 # Install Nginx and Certbot
 install_packages() {
@@ -78,15 +78,15 @@ nginx_config_path() {
     elif [ -d "/etc/nginx/conf.d" ]; then
         NGINX_CONFIG_FILE="/etc/nginx/conf.d/$APP_NAME.conf"
     else
-        echo "❌ Nginx config path not found"
+        echo "Nginx config path not found"
         return 1
     fi
-    echo "✅ Nginx config will be written to: $NGINX_CONFIG_FILE"
+    echo "Nginx config will be written to: $NGINX_CONFIG_FILE"
 }
 
 # Generate Nginx config
 nginx_config() {
-    echo "📄 Writing Nginx config for HTTP..."
+    echo "Writing Nginx config for HTTP..."
     cat > "$NGINX_CONFIG_FILE" <<EOF
 server {
     listen 80;
@@ -101,14 +101,14 @@ server {
     }
 }
 EOF
-    echo "✅ Nginx HTTP config created!"
+    echo "Nginx HTTP config created!"
 }
 
 # Run Certbot automatically
 run_certbot() {
-    echo "🔒 Running Certbot to enable HTTPS..."
+    echo "Running Certbot to enable HTTPS..."
     certbot --nginx -d "$URL" -d "www.$URL" --non-interactive --agree-tos --redirect -m "$EMAIL"
-    echo "✅ HTTPS enabled with Certbot!"
+    echo "HTTPS enabled with Certbot!"
 }
 
 # Enable site and reload Nginx
@@ -118,7 +118,7 @@ enable_and_reload_nginx() {
     fi
     nginx -t
     systemctl reload nginx
-    echo "✅ Nginx reloaded!"
+    echo "Nginx reloaded!"
 }
 
 # Main function
@@ -132,3 +132,4 @@ main() {
 
 # Run main
 main
+
