@@ -77,7 +77,7 @@ setup-dependencies:
     - apt-get install -y bash curl wget git
     - chmod +x $SCRIPTS_DIR/*.sh
   script:
-    - echo "🔧 Setting up project dependencies..."
+    - echo "Setting up project dependencies..."
     - $SCRIPTS_DIR/install-deps.sh
   artifacts:
     paths:
@@ -154,7 +154,7 @@ docker-build-push:
       when: on_success
     - when: never
   before_script:
-    - echo "🐳 Building Docker image for $APP_NAME"
+    - echo "Building Docker image for $APP_NAME"
     - echo "Dockerfile $DOCKERFILE_PATH"
     - echo "Context $DOCKER_CONTEXT"
   script:
@@ -351,5 +351,6 @@ monitoring:
     paths:
       - dashboards/
     expire_in: 1 day
+
 
 
