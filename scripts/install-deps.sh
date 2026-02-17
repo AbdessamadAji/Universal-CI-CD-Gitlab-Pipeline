@@ -6,7 +6,7 @@ set -e
 # install-deps.sh - Auto-detect project type and install dependencies automatically
 # For Docker-based deployments, most dependencies are handled in Dockerfile
 
-echo "🔍 Detecting project type..."
+echo "Detecting project type..."
 
 PROJECT_TYPE=""
 DEPS_INSTALLED=false
@@ -33,13 +33,13 @@ detect_project_type() {
         PROJECT_TYPE="generic"
     fi
     
-    echo "📦 Detected project type: $PROJECT_TYPE"
+    echo "Detected project type: $PROJECT_TYPE"
 }
 
 
 # Install minimal system dependencies for CI
 install_system_deps() {
-    echo "🔧 Installing basic CI tools..."
+    echo "Installing basic CI tools..."
     
     if command -v apk > /dev/null; then
         apk add --no-cache curl wget git || true
@@ -63,18 +63,19 @@ EOF
 
 # Main execution
 main() {
-    echo "🚀 Starting dependency setup..."
+    echo "Starting dependency setup..."
     
     detect_project_type
     install_system_deps
     create_project_info
     
-    echo "📋 Project summary:"
+    echo "Project summary:"
     echo "  - Type: $PROJECT_TYPE"
     echo "  - Dependencies: Handled in Docker build"
     echo "  - CI tools: Installed"
-    echo "🎯 Setup complete - ready for testing and building!"
+    echo "Setup complete - ready for testing and building!"
 }
 
 # Run main function
 main "$@"
+
