@@ -4,7 +4,7 @@ set -e
 # deploy.sh - Universal container deployment script
 # Handles Docker registry login, container lifecycle, and health checks
 
-echo "🚀 Starting container deployment..."
+echo "Starting container deployment..."
 
 # Environment variables with defaults
 APP_NAME=${APP_NAME:-"my-app"}
@@ -30,7 +30,7 @@ log() {
 log_section() {
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔧 $1"
+    echo "$1"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 }
 
@@ -45,7 +45,7 @@ docker_login() {
         log "Using CI_JOB_TOKEN for authentication"
         echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "$CI_REGISTRY"
     else
-        log "⚠️  No registry credentials found - assuming public image or already logged in"
+        log "No registry credentials found - assuming public image or already logged in"
     fi
 }
 
@@ -69,20 +69,20 @@ check_port_availability() {
     
     if command -v netstat >/dev/null 2>&1; then
         if netstat -tlnp 2>/dev/null | grep ":$HOST_PORT " > /dev/null; then
-            log "⚠️  Port $HOST_PORT is currently in use:"
+            log "Port $HOST_PORT is currently in use:"
             netstat -tlnp 2>/dev/null | grep ":$HOST_PORT " || true
         else
-            log "✅ Port $HOST_PORT is available"
+            log "Port $HOST_PORT is available"
         fi
     elif command -v ss >/dev/null 2>&1; then
         if ss -tlnp 2>/dev/null | grep ":$HOST_PORT " > /dev/null; then
-            log "⚠️  Port $HOST_PORT is currently in use:"
+            log "Port $HOST_PORT is currently in use:"
             ss -tlnp 2>/dev/null | grep ":$HOST_PORT " || true
         else
-            log "✅ Port $HOST_PORT is available"
+            log "Port $HOST_PORT is available"
         fi
     else
-        log "⚠️  Unable to check port status (netstat/ss not available)"
+        log "Unable to check port status (netstat/ss not available)"
     fi
 }
 
@@ -93,9 +93,9 @@ pull_image() {
     log "Pulling image: $IMAGE_TAG"
     
     if docker pull "$IMAGE_TAG"; then
-        log "✅ Image pulled successfully"
+        log "Image pulled successfully"
     else
-        log "❌ Failed to pull image: $IMAGE_TAG"
+        log "Failed to pull image: $IMAGE_TAG"
         exit 1
     fi
     
@@ -112,9 +112,9 @@ cleanup_existing_containers() {
         log "Stopping existing container: $CONTAINER_NAME"
         docker stop "$CONTAINER_NAME" || true
         docker rm "$CONTAINER_NAME" || true
-        log "✅ Container $CONTAINER_NAME removed"
+        log "Container $CONTAINER_NAME removed"
     else
-        log "ℹ️  No existing container named $CONTAINER_NAME found"
+        log "No existing container named $CONTAINER_NAME found"
     fi
     
     # Stop any container using the target port
@@ -131,7 +131,7 @@ cleanup_existing_containers() {
             fi
         done
     else
-        log "ℹ️  No containers using port $HOST_PORT"
+        log "No containers using port $HOST_PORT"
     fi
     
     log "Waiting ${PORT_RELEASE_WAIT}s for port to be released..."
@@ -164,9 +164,9 @@ start_container() {
     log "Executing: $docker_cmd"
     
     if eval "$docker_cmd"; then
-        log "✅ Container started successfully"
+        log "Container started successfully"
     else
-        log "❌ Failed to start container"
+        log "Failed to start container"
         exit 1
     fi
     
@@ -185,16 +185,16 @@ perform_health_check() {
         log "Health check attempt $i/$MAX_HEALTH_CHECKS..."
         
         if curl -f -s --max-time 10 "$health_url" > /dev/null 2>&1; then
-            log "✅ Health check passed - application is ready"
+            log "Health check passed - application is ready"
             return 0
         else
             if [[ $i -eq $MAX_HEALTH_CHECKS ]]; then
-                log "❌ Health check failed after $MAX_HEALTH_CHECKS attempts"
+                log "Health check failed after $MAX_HEALTH_CHECKS attempts"
                 log "Container logs (last 50 lines):"
                 docker logs --tail 50 "$CONTAINER_NAME" || true
                 return 1
             else
-                log "⏳ Health check failed, retrying in ${HEALTH_CHECK_INTERVAL}s..."
+                log "Health check failed, retrying in ${HEALTH_CHECK_INTERVAL}s..."
                 sleep "$HEALTH_CHECK_INTERVAL"
             fi
         fi
@@ -258,32 +258,32 @@ EOF
 }
 EOF
     
-    log "✅ Deployment artifacts created:"
+    log "Deployment artifacts created:"
     log "  - deploy.env"
     log "  - deployment-info.json"
 }
 
 # Final deployment summary
 show_deployment_summary() {
-    log_section "🎉 DEPLOYMENT COMPLETE"
+    log_section " DEPLOYMENT COMPLETE"
     
     cat << EOF
 ┌─────────────────────────────────────────────────────────────────┐
 │                     DEPLOYMENT SUMMARY                         │
 ├─────────────────────────────────────────────────────────────────┤
-│ 🎯 Application: $APP_NAME
-│ 🐳 Container:   $CONTAINER_NAME
-│ 🌐 URL:         http://localhost:$HOST_PORT
-│ 🏷️  Image:       $IMAGE_TAG
-│ ⏰ Time:        $(date)
+│ Application: $APP_NAME
+│ Container:   $CONTAINER_NAME
+│ URL:         http://localhost:$HOST_PORT
+│ Image:       $IMAGE_TAG
+│ Time:        $(date)
 ├─────────────────────────────────────────────────────────────────┤
 │                    USEFUL COMMANDS                             │
 ├─────────────────────────────────────────────────────────────────┤
-│ 🔍 Check status:    docker ps -f name=$CONTAINER_NAME
-│ 📋 View logs:       docker logs -f $CONTAINER_NAME
-│ 🐚 Enter container: docker exec -it $CONTAINER_NAME sh
-│ 🌡️  Health check:   curl http://localhost:$HOST_PORT$HEALTH_CHECK_PATH
-│ 🛑 Stop container:  docker stop $CONTAINER_NAME
+│ Check status:    docker ps -f name=$CONTAINER_NAME
+│ View logs:       docker logs -f $CONTAINER_NAME
+│ Enter container: docker exec -it $CONTAINER_NAME sh
+│ Health check:   curl http://localhost:$HOST_PORT$HEALTH_CHECK_PATH
+│ Stop container:  docker stop $CONTAINER_NAME
 └─────────────────────────────────────────────────────────────────┘
 EOF
 }
@@ -361,3 +361,4 @@ EOF
 
 # Execute main function
 main "$@"
+
