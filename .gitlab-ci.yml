@@ -122,9 +122,9 @@ run-tests:
       fi
     - chmod +x $SCRIPTS_DIR/*.sh
   script:
-    - echo "☕ Running build (Java apps) or letting Docker handle other techs..."
+    - echo "Running build (Java apps) or letting Docker handle other techs..."
     - $SCRIPTS_DIR/build.sh
-    - echo "🧪 Running tests..."
+    - echo "Running tests..."
     - $SCRIPTS_DIR/test.sh
   artifacts:
     reports:
@@ -194,7 +194,7 @@ security-scan:
     TARGET_IMAGE: "${CI_REGISTRY_IMAGE}:${IMAGE_TAG_SHORT}"
     DOCKER_HOST: "unix:///var/run/docker.sock"  # Use default Unix socket
   before_script:
-    - echo "🔒 Preparing security scan for $TARGET_IMAGE"
+    - echo "Preparing security scan for $TARGET_IMAGE"
     # Check Docker access
     - docker --version || { echo "Docker not available"; exit 1; }
     - docker info || { echo "Docker daemon not accessible"; exit 1; }
@@ -222,10 +222,10 @@ security-scan:
         echo "curl not available - skipping connectivity test"
       fi
   script:
-    - echo "🔍 Running comprehensive security scan..."
+    - echo "Running comprehensive security scan..."
     - $SCRIPTS_DIR/scan-docker.sh "$TARGET_IMAGE"
   after_script:
-    - echo "📊 Security scan completed"
+    - echo "Security scan completed"
     - docker logout "$CI_REGISTRY" || true
     # Ensure reports directory exists even if scan failed
     - mkdir -p security-reports
@@ -289,12 +289,12 @@ deploy-vm:
     # Check if we have docker access (no sudo needed if runner has permissions)
     - docker --version || { echo "Docker not available"; exit 1; }
     - chmod +x $SCRIPTS_DIR/*.sh || { echo "Scripts not executable"; exit 1; }
-    - echo "🚀 Preparing deployment for $APP_NAME"
+    - echo "Preparing deployment for $APP_NAME"
   script:
-    - echo "🔄 Running deployment script..."
+    - echo "Running deployment script..."
     - $SCRIPTS_DIR/deploy.sh
   after_script:
-    - echo "🧹 Running cleanup script..."
+    - echo "Running cleanup script..."
     - $SCRIPTS_DIR/cleanup.sh || true
     # Always create basic deployment info even if deployment failed
     - |
@@ -344,11 +344,12 @@ monitoring:
     - when: never
   before_script:
     - chmod +x $SCRIPTS_DIR/*.sh
-    - echo "🚀 Setting up monitoring stack (Prometheus + Grafana + dashboards)"
+    - echo "Setting up monitoring stack (Prometheus + Grafana + dashboards)"
   script:
     - sudo $SCRIPTS_DIR/monitoring.sh  # <-- your script
   artifacts:
     paths:
       - dashboards/
     expire_in: 1 day
+
 
