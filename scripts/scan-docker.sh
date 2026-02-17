@@ -33,19 +33,19 @@ CACHE_DIR="/tmp/trivy-cache"
 # HELPER FUNCTIONS
 # -------------------------
 log_info() {
-    echo -e "${BLUE}ℹ️  $1${NC}"
+    echo -e "${BLUE}$1${NC}"
 }
 
 log_success() {
-    echo -e "${GREEN}✅ $1${NC}"
+    echo -e "${GREEN}$1${NC}"
 }
 
 log_warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
+    echo -e "${YELLOW}$1${NC}"
 }
 
 log_error() {
-    echo -e "${RED}❌ $1${NC}"
+    echo -e "${RED}$1${NC}"
 }
 
 # Check if command exists
@@ -406,12 +406,12 @@ EOF
         # Display results
         echo
         log_info "=== VULNERABILITY SCAN SUMMARY ==="
-        echo "🎯 Target: $TARGET_IMAGE"
+        echo "Target: $TARGET_IMAGE"
         echo "🔴 Critical: $critical_count"
         echo "🟠 High: $high_count"
         echo "🟡 Medium: $medium_count"
         echo "🟢 Low: $low_count"
-        echo "📊 Total: $((critical_count + high_count + medium_count + low_count))"
+        echo "Total: $((critical_count + high_count + medium_count + low_count))"
         echo
         
         # Determine if we should fail based on severity
@@ -449,7 +449,7 @@ generate_final_reports() {
     fi
     
     # Create GitLab-compatible report URLs
-    echo "📋 Generated Reports:"
+    echo "Generated Reports:"
     echo "   - JSON Report: $REPORTS_DIR/trivy-vulnerabilities.json"
     echo "   - SARIF Report: $REPORTS_DIR/trivy-sast.json"
     echo "   - Table Report: $REPORTS_DIR/trivy-table.txt"
@@ -459,7 +459,7 @@ generate_final_reports() {
     
     # Create artifact for GitLab
     if [[ -n "${CI_JOB_URL:-}" ]]; then
-        echo "🔗 View detailed results in GitLab pipeline artifacts"
+        echo "View detailed results in GitLab pipeline artifacts"
     fi
 }
 
@@ -467,7 +467,7 @@ generate_final_reports() {
 # MAIN EXECUTION
 # -------------------------
 main() {
-    log_info "🔒 Starting Universal Docker Security Scanner"
+    log_info "Starting Universal Docker Security Scanner"
     log_info "=================================================="
     
     validate_inputs
@@ -537,12 +537,12 @@ main() {
     generate_final_reports
     
     if [[ $final_exit_code -eq 0 ]]; then
-        log_success "Security scan completed successfully! ✨"
+        log_success "Security scan completed successfully!"
         if [[ "$use_docker_trivy" == "true" ]]; then
-            log_info "💡 Consider installing Trivy globally on your runner for better performance"
+            log_info "Consider installing Trivy globally on your runner for better performance"
         fi
     else
-        log_error "Security scan found issues that require attention! 🚨"
+        log_error "Security scan found issues that require attention!"
     fi
     
     log_info "=================================================="
@@ -552,3 +552,4 @@ main() {
 
 # Run main function
 main "$@"
+
