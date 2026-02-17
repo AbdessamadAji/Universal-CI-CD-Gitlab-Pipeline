@@ -6,7 +6,7 @@ set -e
 # DRY_RUN : shows what would happen without actually making any changes
 
 
-echo "🧹 Starting cleanup process..."
+echo "Starting cleanup process..."
 
 # Environment variables with defaults
 APP_NAME=${APP_NAME:-"my-app"}
@@ -28,7 +28,7 @@ log() {
 log_section() {
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔧 $1"
+    echo "$1"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 }
 
@@ -42,9 +42,9 @@ execute_command() {
     else
         log "Executing: $description"
         if eval "$cmd"; then
-            log "✅ Success: $description"
+            log "Success: $description"
         else
-            log "⚠️  Warning: Failed to $description"
+            log "Warning: Failed to $description"
         fi
     fi
 }
@@ -76,10 +76,10 @@ cleanup_stopped_containers() {
         else
             log "Removing stopped containers..."
             echo "$stopped_containers" | xargs -r docker rm
-            log "✅ Stopped containers removed"
+            log "Stopped containers removed"
         fi
     else
-        log "ℹ️  No stopped containers to remove"
+        log "No stopped containers to remove"
     fi
 }
 
@@ -88,7 +88,7 @@ cleanup_old_images() {
     log_section "OLD IMAGES CLEANUP"
     
     if [[ -z "$CI_REGISTRY_IMAGE" ]]; then
-        log "⚠️  CI_REGISTRY_IMAGE not set, skipping old image cleanup"
+        log "CI_REGISTRY_IMAGE not set, skipping old image cleanup"
         return 0
     fi
     
@@ -101,7 +101,7 @@ cleanup_old_images() {
                  sort -k3 -r || true)
     
     if [[ -z "$image_list" ]]; then
-        log "ℹ️  No images found for $CI_REGISTRY_IMAGE"
+        log "No images found for $CI_REGISTRY_IMAGE"
         return 0
     fi
     
@@ -110,7 +110,7 @@ cleanup_old_images() {
     log "Found $total_images images for $CI_REGISTRY_IMAGE"
     
     if [[ $total_images -le $KEEP_IMAGES ]]; then
-        log "ℹ️  Only $total_images images found, keeping all (threshold: $KEEP_IMAGES)"
+        log "Only $total_images images found, keeping all (threshold: $KEEP_IMAGES)"
         return 0
     fi
     
@@ -136,7 +136,7 @@ cleanup_old_images() {
             done
         fi
     else
-        log "ℹ️  No old images to remove"
+        log "No old images to remove"
     fi
 }
 
@@ -159,7 +159,7 @@ cleanup_dangling_images() {
             execute_command "echo '$dangling_images' | xargs -r docker rmi" "remove dangling images"
         fi
     else
-        log "ℹ️  No dangling images found"
+        log "No dangling images found"
     fi
 }
 
@@ -182,7 +182,7 @@ cleanup_unused_networks() {
             execute_command "docker network prune -f" "remove unused networks"
         fi
     else
-        log "ℹ️  No unused networks found"
+        log "No unused networks found"
     fi
 }
 
@@ -198,7 +198,7 @@ cleanup_unused_volumes() {
         count=$(echo "$unused_volumes" | wc -l)
         log "Found $count unused volumes"
         
-        log "⚠️  Volume cleanup is conservative - only removing clearly unused volumes"
+        log "Volume cleanup is conservative - only removing clearly unused volumes"
         
         if [[ "$DRY_RUN" == "true" ]]; then
             log "[DRY RUN] Would remove unused volumes:"
@@ -208,7 +208,7 @@ cleanup_unused_volumes() {
             execute_command "docker volume prune -f" "remove unused volumes"
         fi
     else
-        log "ℹ️  No unused volumes found"
+        log "No unused volumes found"
     fi
 }
 
@@ -250,16 +250,16 @@ check_disk_space_after() {
 
 # Generate cleanup summary
 generate_cleanup_summary() {
-    log_section "🎉 CLEANUP SUMMARY"
+    log_section "CLEANUP SUMMARY"
     
     cat << EOF
 ┌─────────────────────────────────────────────────────────────────┐
 │                      CLEANUP COMPLETE                          │
 ├─────────────────────────────────────────────────────────────────┤
-│ 🧹 Cleanup mode: $([ "$DRY_RUN" == "true" ] && echo "DRY RUN" || echo "EXECUTED")
-│ 📦 App images kept: $KEEP_IMAGES most recent
-│ 📋 Log file: $CLEANUP_LOG
-│ ⏰ Completed: $(date)
+│ Cleanup mode: $([ "$DRY_RUN" == "true" ] && echo "DRY RUN" || echo "EXECUTED")
+│ App images kept: $KEEP_IMAGES most recent
+│ Log file: $CLEANUP_LOG
+│ Completed: $(date)
 ├─────────────────────────────────────────────────────────────────┤
 │                    CLEANUP ACTIONS                             │
 ├─────────────────────────────────────────────────────────────────┤
@@ -275,16 +275,16 @@ EOF
     
     if [[ "$DRY_RUN" == "true" ]]; then
         echo ""
-        log "💡 To execute cleanup, run: DRY_RUN=false $0"
+        log "To execute cleanup, run: DRY_RUN=false $0"
     fi
 }
 
 # Main cleanup function
 main() {
-    log "🧹 Starting cleanup for $APP_NAME..."
+    log "Starting cleanup for $APP_NAME..."
     
     if [[ "$DRY_RUN" == "true" ]]; then
-        log "🔍 Running in DRY RUN mode - no changes will be made"
+        log "Running in DRY RUN mode - no changes will be made"
     fi
     
     # Pre-cleanup assessment
@@ -303,11 +303,12 @@ main() {
     check_disk_space_after
     generate_cleanup_summary
     
-    log "✅ Cleanup completed successfully!"
+    log "Cleanup completed successfully!"
 }
 
 # Error handling
-trap 'log "❌ Cleanup script failed at line $LINENO"' ERR
+trap 'log "Cleanup script failed at line $LINENO"' ERR
 
 # Execute main function
 main "$@"
+
