@@ -44,4 +44,5 @@ done
 echo "Applying schema.sql..."
 docker exec -i mysql-db mysql -u test -ptest mydb < ./schema.sql
 
-echo "✅ MySQL setup completed!"
+echo "MySQL setup completed!"
+
