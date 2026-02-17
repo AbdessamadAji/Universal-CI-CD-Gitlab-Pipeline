@@ -131,9 +131,9 @@ EOF
         echo "Checking service status..."
         for service in prometheus grafana-server node_exporter cadvisor docker; do
             if systemctl is-active --quiet "$service"; then
-                echo "✅ $service is running"
+                echo "$service is running"
             else
-                echo "❌ $service is not running"
+                echo "$service is not running"
             fi
         done
 
@@ -189,11 +189,11 @@ EOF
     echo "Waiting for Prometheus to be ready..."
     for i in {1..30}; do
         if curl -s http://localhost:9090/-/ready | grep -q "Prometheus Server is Ready."; then
-            echo "✅ Prometheus is running!"
+            echo "Prometheus is running!"
             break
         fi
         if [ $i -eq 30 ]; then
-            echo "❌ Prometheus not ready after 30 attempts!"
+            echo "Prometheus not ready after 30 attempts!"
             return 1
         fi
         sleep 2
@@ -222,11 +222,11 @@ EOF
     echo "Waiting for Grafana to be ready..."
     for i in {1..30}; do
         if curl -s http://localhost:3000/api/health | jq -e '.database=="ok"' > /dev/null; then
-            echo "✅ Grafana is working (admin/admin)"
+            echo "Grafana is working (admin/admin)"
             break
         fi
         if [ $i -eq 30 ]; then
-            echo "❌ Grafana not ready after 30 attempts!"
+            echo "Grafana not ready after 30 attempts!"
         fi
         sleep 2
     done
@@ -253,11 +253,11 @@ EOF
     echo "Waiting for Node Exporter to be ready..."
     for i in {1..15}; do
         if curl -s http://localhost:9100/metrics | grep -q "node_cpu_seconds_total"; then
-            echo "✅ Node exporter is working"
+            echo "Node exporter is working"
             break
         fi
         if [ $i -eq 15 ]; then
-            echo "❌ Node exporter not ready!"
+            echo "Node exporter not ready!"
         fi
         sleep 2
     done
@@ -291,7 +291,7 @@ EOF
     echo "Waiting for cAdvisor to be ready..."
     for i in {1..15}; do
         if curl -s http://localhost:8080/metrics | grep -q "container_cpu_usage_seconds_total"; then
-            echo "✅ cAdvisor exporter is working"
+            echo "cAdvisor exporter is working"
             break
         fi
         if [ $i -eq 15 ]; then
@@ -356,7 +356,7 @@ auto_discover_docker() {
     static_configs:
       - targets: $targets
 EOL
-            echo "✅ Added $job_name job to Prometheus config"
+            echo "Added $job_name job to Prometheus config"
         fi
     }
 
@@ -386,7 +386,7 @@ EOL
                     break  # Take first port
                 done
             else
-                echo "⚠️ No exposed ports found for $container, skipping..."
+                echo "No exposed ports found for $container, skipping..."
             fi
         done
         
@@ -403,7 +403,7 @@ EOL
     static_configs:
 $(echo -e "$TARGETS" | sed 's/^/    /')
 EOL
-            echo "✅ Added my_apps job with discovered containers"
+            echo "Added my_apps job with discovered containers"
         fi
     else
         echo "No application containers detected"
@@ -414,9 +414,9 @@ EOL
     
     # Reload Prometheus configuration
     if docker kill -s HUP "$PROM_CON" 2>/dev/null; then
-        echo "✅ Prometheus configuration reloaded"
+        echo "Prometheus configuration reloaded"
     else
-        echo "⚠️ Failed to reload Prometheus, restarting container..."
+        echo "Failed to reload Prometheus, restarting container..."
         docker restart "$PROM_CON"
     fi
 }
@@ -454,7 +454,7 @@ auto_discover_local() {
     fi
     
     if [ -z "$PROM_PATH" ]; then
-        echo "❌ Prometheus config file not found"
+        echo "Prometheus config file not found"
         return 1
     fi
     
@@ -499,7 +499,7 @@ scrape_configs:
       - targets: ['localhost:8080']
 EOF
 
-    echo "✅ Added local monitoring services"
+    echo "Added local monitoring services"
 
     # Find Docker app containers and add them dynamically
     if command -v docker &> /dev/null && docker info &> /dev/null; then
@@ -550,7 +550,7 @@ EOF
                         
                         # Add target without newline
                         printf "          '${CONTAINER_IP}:${PORT_NUM}'" >> "$PROM_PATH"
-                        echo "  📱 Added app target: ${container} -> ${CONTAINER_IP}:${PORT_NUM}"
+                        echo " Added app target: ${container} -> ${CONTAINER_IP}:${PORT_NUM}"
                         FIRST_TARGET=false
                     fi
                 fi
@@ -565,23 +565,23 @@ EOF
     fi
 
     # Reload Prometheus
-    echo "🔄 Reloading Prometheus..."
+    echo "Reloading Prometheus..."
     if command -v systemctl &> /dev/null; then
         systemctl reload prometheus || systemctl restart prometheus
-        echo "✅ Prometheus service reloaded"
+        echo "Prometheus service reloaded"
     elif command -v service &> /dev/null; then
         service prometheus reload || service prometheus restart
-        echo "✅ Prometheus service reloaded"
+        echo "Prometheus service reloaded"
     else
         PROM_PID=$(pgrep prometheus)
         if [ -n "$PROM_PID" ]; then
             kill -HUP "$PROM_PID"
-            echo "✅ Prometheus process reloaded via SIGHUP"
+            echo "Prometheus process reloaded via SIGHUP"
         fi
     fi
     
     echo ""
-    echo "🌐 Access Prometheus targets at: http://localhost:9090/targets"
+    echo "Access Prometheus targets at: http://localhost:9090/targets"
 }
 
 #send metrics to grafana
@@ -618,7 +618,7 @@ dashboards() {
     chmod 777 dashboards/*.json
 
     # Instructions for the user
-    echo "✅ Dashboards folder is ready"
+    echo "Dashboards folder is ready"
     echo "Go to http://localhost:3000/dashboards"
     echo "Go to New → Create a new dashboard → Import dashboard → Upload JSON file."
     echo "Select the JSON file from ./dashboards/."
@@ -654,13 +654,13 @@ main() {
     
     echo
     display "Setup Complete"
-    echo "🎉 Monitoring setup is complete!"
+    echo " Monitoring setup is complete!"
     echo
     echo "Access your monitoring services at:"
-    echo "  📊 Prometheus: http://localhost:9090"
-    echo "  📈 Grafana: http://localhost:3000 (admin/admin)"
-    echo "  🖥️  Node Exporter: http://localhost:9100"
-    echo "  📦 cAdvisor: http://localhost:8080"
+    echo "  Prometheus: http://localhost:9090"
+    echo "  Grafana: http://localhost:3000 (admin/admin)"
+    echo "  Node Exporter: http://localhost:9100"
+    echo "  cAdvisor: http://localhost:8080"
     echo
 	
 	display "Preparing dashboards"
@@ -671,3 +671,4 @@ main() {
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     main "$@"
 fi
+
