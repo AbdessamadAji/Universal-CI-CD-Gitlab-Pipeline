@@ -7,7 +7,7 @@ set -e
 display() {
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔧 $1"
+    echo "$1"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 }
 
@@ -20,7 +20,7 @@ BUILD_EXIT_CODE=0
 detect_project_type() {
     if [[ -f ".deps/project_type" ]]; then
         PROJECT_TYPE=$(cat .deps/project_type)
-        echo "📋 Project type from cache: $PROJECT_TYPE"
+        echo "Project type from cache: $PROJECT_TYPE"
     elif [[ -f "package.json" ]]; then
         PROJECT_TYPE="nodejs"
     elif [[ -f "requirements.txt" || -f "pyproject.toml" || -f "setup.py" ]]; then
@@ -41,14 +41,14 @@ detect_project_type() {
         PROJECT_TYPE="generic"
     fi
     
-    echo "📦 Detected project type: $PROJECT_TYPE"
+    echo "Detected project type: $PROJECT_TYPE"
 }
 
 # Run build based on project type
 run_builds() {
     case $PROJECT_TYPE in
         "java")
-            echo "☕ Running Java build..."
+            echo "Running Java build..."
             if command -v java > /dev/null 2>&1; then
     		if command -v mvn > /dev/null 2>&1; then
         		mvn clean package || BUILD_EXIT_CODE=$?
@@ -68,7 +68,7 @@ run_builds() {
 	     fi
              ;;
         *)
-            echo "📦 $PROJECT_TYPE project: let Dockerfile handle build"
+            echo "$PROJECT_TYPE project: let Dockerfile handle build"
             ;;
     esac
 }
@@ -77,10 +77,11 @@ main() {
     detect_project_type
     run_builds
     
-    echo "📋 Build summary:"
+    echo "Build summary:"
     echo "  - Type: $PROJECT_TYPE"
-    echo "🎯 Build completed!"
+    echo "Build completed!"
     exit $BUILD_EXIT_CODE
 }
 
 main "$@"
+
